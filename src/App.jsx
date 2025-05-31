@@ -2,15 +2,33 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
 import LandingPage from './pages2/LandingPage'
+import Builder from './pages2/Builder';
 
 
 function App() {
-  const [count, setCount] = useState(0)
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <LandingPage/>,
+    },
+
+    
+
+    {
+      path: "/builder",
+      element: <Builder/>,
+    },
+  ])
 
   return (
     <div>
-      <LandingPage/>
+      <RouterProvider router={router}/>
+      
     </div>
   )
 }
