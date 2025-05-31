@@ -1,11 +1,18 @@
-import React from 'react';
-import LandingPage from './LandingPage';
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import LandingPage from './pages2/LandingPage'
+
 
 function App() {
-  return <LandingPage />;
+  const [count, setCount] = useState(0)
+
+  return (
+    <div>
+      <LandingPage/>
+    </div>
+  )
 }
 
-<div className="bg-red-500 text-white p-4">Hello Tailwind</div>
-
-
-export default App;
+export default App

@@ -16,7 +16,6 @@ const LandingPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
-    // Later: Send data to backend or navigate to drag-and-drop builder
   };
 
   return (
