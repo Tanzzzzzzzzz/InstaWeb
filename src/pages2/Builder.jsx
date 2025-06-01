@@ -1,71 +1,72 @@
-// pages/Builder.jsx
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Builder = () => {
-  const navigate = useNavigate();
   const [elements, setElements] = useState([]);
-  const [siteData, setSiteData] = useState({});
-
-  useEffect(() => {
-    const data = localStorage.getItem("siteData");
-    if (data) setSiteData(JSON.parse(data));
-  }, []);
+  const [activeId, setActiveId] = useState(null);
+  const navigate = useNavigate();
 
   const addElement = (type) => {
-    const newElement = {
-      id: Date.now(),
-      type,
-      content: type === "image" ? "https://via.placeholder.com/150" : `${type} content`,
-    };
+    const newElement = { id: Date.now(), type, content: type === "image" ? "https://via.placeholder.com/300" : `${type} content` };
     setElements([...elements, newElement]);
   };
 
-  const handleContentChange = (id, value) => {
-    setElements(elements.map(el => el.id === id ? { ...el, content: value } : el));
+  const updateContent = (id, content) => {
+    setElements(elements.map(el => el.id === id ? { ...el, content } : el));
   };
 
-  const goToPreview = () => {
+  const handlePreview = () => {
     localStorage.setItem("previewElements", JSON.stringify(elements));
     navigate("/site");
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      <div className="md:w-1/4 bg-gray-100 p-6 border-r space-y-4">
-        <h2 className="text-xl font-bold">Add Elements</h2>
-        <button onClick={() => addElement("text")} className="block w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded">Add Text</button>
-        <button onClick={() => addElement("heading")} className="block w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded">Add Heading</button>
-        <button onClick={() => addElement("button")} className="block w-full bg-purple-500 hover:bg-purple-600 text-white py-2 rounded">Add Button</button>
-        <button onClick={() => addElement("image")} className="block w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded">Add Image</button>
-        <button onClick={goToPreview} className="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded">Preview Site</button>
-      </div>
+    <div className="flex min-h-screen bg-gray-100">
+      <aside className="w-1/4 bg-white p-6 border-r space-y-4">
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">Add Elements</h2>
+        {['text', 'heading', 'button', 'image'].map(type => (
+          <button
+            key={type}
+            onClick={() => addElement(type)}
+            className="w-full px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded"
+          >
+            Add {type.charAt(0).toUpperCase() + type.slice(1)}
+          </button>
+        ))}
+        <button
+          onClick={handlePreview}
+          className="w-full px-4 py-2 mt-6 bg-green-500 hover:bg-green-600 text-white rounded"
+        >
+          Preview Website
+        </button>
+      </aside>
 
-      <div className="flex-1 p-6">
-        <h1 className="text-2xl font-bold mb-4">Builder Canvas</h1>
-        <div className="space-y-4">
+      <main className="flex-1 p-6 bg-gradient-to-br from-blue-50 to-purple-100">
+        <div className="bg-white rounded-lg shadow-lg p-6 space-y-4">
+          <h2 className="text-2xl font-bold text-purple-600">Design Canvas</h2>
           {elements.map((el) => (
-            <div key={el.id} className="border p-3 rounded-md bg-white shadow">
+            <div
+              key={el.id}
+              onClick={() => setActiveId(el.id)}
+              className={`p-3 border rounded ${activeId === el.id ? "border-purple-500" : "border-gray-300"}`}
+            >
               {el.type === "image" ? (
-                <input
-                  type="text"
-                  value={el.content}
-                  onChange={(e) => handleContentChange(el.id, e.target.value)}
-                  placeholder="Image URL"
-                  className="w-full p-2 border rounded"
-                />
+                <img src={el.content} alt="Element" className="w-full max-w-sm rounded" />
               ) : (
+                <div>{el.content}</div>
+              )}
+              {activeId === el.id && (
                 <input
                   type="text"
                   value={el.content}
-                  onChange={(e) => handleContentChange(el.id, e.target.value)}
-                  className="w-full p-2 border rounded"
+                  onChange={(e) => updateContent(el.id, e.target.value)}
+                  className="mt-2 p-2 w-full border rounded"
                 />
               )}
             </div>
           ))}
         </div>
-      </div>
+      </main>
     </div>
   );
 };
