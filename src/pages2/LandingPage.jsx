@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useContext } from 'react';
+import { WebsiteContext } from '../context/WebsiteContext';
 
 const LandingPage = () => {
+  const { updateWebsiteName } = useContext(WebsiteContext)  
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     siteName: "",
@@ -15,7 +18,15 @@ const LandingPage = () => {
   };
 
   const handleStart = () => {
+
     localStorage.setItem("siteData", JSON.stringify(formData));
+    navigate("/builder");
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const name = e.target.websiteName.value;
+    updateWebsiteName(name);
     navigate("/builder");
   };
 
@@ -66,6 +77,13 @@ const LandingPage = () => {
         >
           Start Building
         </button>
+
+        <form onSubmit={handleSubmit}>
+            <input name="websiteName" placeholder="Enter Website Name" />
+            <button type="submit">Continue</button>
+        </form>
+
+
       </div>
     </div>
   );

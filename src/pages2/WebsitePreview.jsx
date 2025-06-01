@@ -1,60 +1,48 @@
-// pages/WebsitePreview.jsx
-import React, { useEffect, useState } from "react";
+// src/pages/WebsitePreview.jsx
+import React, { useContext } from 'react';
+import { WebsiteContext } from '../context/WebsiteContext';
+import { Rnd } from 'react-rnd';
 
 const WebsitePreview = () => {
-  const [elements, setElements] = useState([]);
-  const [siteData, setSiteData] = useState({});
-
-  useEffect(() => {
-    const data = localStorage.getItem("previewElements");
-    const site = localStorage.getItem("siteData");
-    if (data) setElements(JSON.parse(data));
-    if (site) setSiteData(JSON.parse(site));
-  }, []);
+  const { websiteData } = useContext(WebsiteContext);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-indigo-900 text-white py-12 px-4 sm:px-8">
-      <div className="max-w-5xl mx-auto bg-white text-gray-800 rounded-xl shadow-2xl overflow-hidden">
-        <header className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-center">
-          <h1 className="text-4xl font-extrabold text-white drop-shadow-md">{siteData.name || "My Awesome Website"}</h1>
-          <p className="text-lg mt-2 text-indigo-100">Created by {siteData.owner || "You"}</p>
-        </header>
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 to-purple-300 p-10" style={{ fontFamily: 'Arial, sans-serif' }}>
+      <div className="bg-white shadow-2xl rounded-3xl p-10 max-w-5xl mx-auto border-4 border-purple-500">
+        <h1 className="text-5xl font-extrabold text-purple-800 text-center mb-10">
+          {websiteData.websiteName || 'Your Website Preview'}
+        </h1>
 
-        <main className="p-8 space-y-8 bg-gradient-to-b from-white to-gray-50">
-          {elements.map((el) => {
-            switch (el.type) {
-              case "heading":
-                return <h2 key={el.id} className="text-3xl font-bold text-purple-800 border-l-4 border-purple-500 pl-4">{el.content}</h2>;
-              case "text":
-                return <p key={el.id} className="text-lg leading-relaxed text-gray-700">{el.content}</p>;
-              case "button":
-                return (
-                  <button
-                    key={el.id}
-                    className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold rounded shadow-md"
-                  >
-                    {el.content}
-                  </button>
-                );
-              case "image":
-                return (
-                  <div key={el.id} className="flex justify-center">
-                    <img
-                      src={el.content}
-                      alt="Custom"
-                      className="w-full max-w-md rounded-xl border shadow-lg hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                );
-              default:
-                return null;
-            }
-          })}
-        </main>
-
-        <footer className="bg-gray-100 text-center p-4 text-sm text-gray-600">
-          <p>&copy; {new Date().getFullYear()} {siteData.name || "My Website"}. All rights reserved.</p>
-        </footer>
+        <div className="relative w-full h-[60vh] border border-dashed border-purple-400 rounded-xl bg-purple-50 overflow-hidden">
+          {websiteData.elements.map((el, index) => (
+            <Rnd
+              key={index}
+              default={{ x: 50 + index * 20, y: 50 + index * 20, width: 'auto', height: 'auto' }}
+              bounds="parent"
+              enableResizing={false}
+            >
+              <div className="p-2 bg-white rounded shadow-md cursor-move">
+                {el.type === 'heading' && (
+                  <h2 style={{ fontSize: el.fontSize, color: el.customColor }} className="font-semibold">
+                    {el.content || 'Heading'}
+                  </h2>
+                )}
+                {el.type === 'paragraph' && (
+                  <p style={{ fontSize: el.fontSize, color: el.customColor }}>
+                    {el.content || 'Paragraph content here...'}
+                  </p>
+                )}
+                {el.type === 'image' && el.src && (
+                  <img
+                    src={el.src}
+                    alt="Uploaded"
+                    className="rounded-lg shadow-md max-w-[200px]"
+                  />
+                )}
+              </div>
+            </Rnd>
+          ))}
+        </div>
       </div>
     </div>
   );

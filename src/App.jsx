@@ -10,6 +10,7 @@ import LandingPage from './pages2/LandingPage'
 import Builder from './pages2/Builder';
 import PublishedSite from './pages2/PublishedSite';
 import WebsitePreview from './pages2/WebsitePreview';
+import { WebsiteProvider } from "./context/WebsiteContext";
 
 
 function App() {
@@ -37,7 +38,10 @@ function App() {
 
   return (
     <div>
-      <RouterProvider router={router}/>
+      <WebsiteProvider>
+        <RouterProvider router={router}/>
+      </WebsiteProvider>
+      
       
     </div>
   )
