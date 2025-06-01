@@ -8,6 +8,8 @@ import {
 } from "react-router-dom";
 import LandingPage from './pages2/LandingPage'
 import Builder from './pages2/Builder';
+import PublishedSite from './pages2/PublishedSite';
+import WebsitePreview from './pages2/WebsitePreview';
 
 
 function App() {
@@ -17,11 +19,19 @@ function App() {
       element: <LandingPage/>,
     },
 
-    
+    {
+      path: "/site",
+      element: <WebsitePreview/>,
+    },
 
     {
       path: "/builder",
       element: <Builder/>,
+    },
+
+    {
+      path: "/published",
+      element: <PublishedSite/>,
     },
   ])
 

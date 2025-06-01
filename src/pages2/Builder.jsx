@@ -1,88 +1,71 @@
-import React, { useState } from "react";
-import { DndContext } from "@dnd-kit/core";
-import DraggableElement from "../components/DraggableElement";
-import DroppableCanvas from "../components/DroppableCanvas";
-import PropertiesPanel from "../components/PropertiesPanel";
+// pages/Builder.jsx
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Builder = () => {
+  const navigate = useNavigate();
   const [elements, setElements] = useState([]);
-  const [selected, setSelected] = useState(null);
+  const [siteData, setSiteData] = useState({});
 
-  const handleDragEnd = (event) => {
-    const { over, active } = event;
-    if (over?.id === "canvas") {
-      const newElement = createElementFromId(active.id);
-      setElements((prev) => [...prev, newElement]);
-    }
+  useEffect(() => {
+    const data = localStorage.getItem("siteData");
+    if (data) setSiteData(JSON.parse(data));
+  }, []);
+
+  const addElement = (type) => {
+    const newElement = {
+      id: Date.now(),
+      type,
+      content: type === "image" ? "https://via.placeholder.com/150" : `${type} content`,
+    };
+    setElements([...elements, newElement]);
   };
 
-  const createElementFromId = (id) => {
-    switch (id) {
-      case "text":
-        return { id: Date.now(), type: "text", content: "Sample text" };
-      case "image":
-        return {
-          id: Date.now(),
-          type: "image",
-          src: "https://via.placeholder.com/150",
-        };
-      case "button":
-        return { id: Date.now(), type: "button", label: "Click Me" };
-      default:
-        return null;
-    }
+  const handleContentChange = (id, value) => {
+    setElements(elements.map(el => el.id === id ? { ...el, content: value } : el));
   };
 
-  const handleUpdateElement = (updatedElement) => {
-    setElements((prev) =>
-      prev.map((el) => (el.id === updatedElement.id ? updatedElement : el))
-    );
-    setSelected(updatedElement);
+  const goToPreview = () => {
+    localStorage.setItem("previewElements", JSON.stringify(elements));
+    navigate("/site");
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Left Sidebar */}
-      <div className="w-1/4 bg-white p-4 shadow-md border-r">
-        <h2 className="text-xl font-bold mb-4">Elements</h2>
-        <DndContext onDragEnd={handleDragEnd}>
-          <DraggableElement id="text">📝 Text</DraggableElement>
-          <DraggableElement id="image">🖼️ Image</DraggableElement>
-          <DraggableElement id="button">🔘 Button</DraggableElement>
-        </DndContext>
+    <div className="min-h-screen flex flex-col md:flex-row">
+      <div className="md:w-1/4 bg-gray-100 p-6 border-r space-y-4">
+        <h2 className="text-xl font-bold">Add Elements</h2>
+        <button onClick={() => addElement("text")} className="block w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded">Add Text</button>
+        <button onClick={() => addElement("heading")} className="block w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded">Add Heading</button>
+        <button onClick={() => addElement("button")} className="block w-full bg-purple-500 hover:bg-purple-600 text-white py-2 rounded">Add Button</button>
+        <button onClick={() => addElement("image")} className="block w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded">Add Image</button>
+        <button onClick={goToPreview} className="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded">Preview Site</button>
       </div>
 
-      {/* Center Canvas */}
-      <div className="flex-1 p-4">
-        <h2 className="text-xl font-semibold mb-2">Your Website</h2>
-        <DndContext onDragEnd={handleDragEnd}>
-          <DroppableCanvas>
-            {elements.map((el) => (
-              <div
-                key={el.id}
-                className="p-2 border mb-2 cursor-pointer"
-                onClick={() => setSelected(el)}
-              >
-                {el.type === "text" && <p>{el.content}</p>}
-                {el.type === "image" && (
-                  <img src={el.src} alt="user" className="w-32" />
-                )}
-                {el.type === "button" && (
-                  <button className="bg-blue-500 text-white px-4 py-2 rounded">
-                    {el.label}
-                  </button>
-                )}
-              </div>
-            ))}
-          </DroppableCanvas>
-        </DndContext>
+      <div className="flex-1 p-6">
+        <h1 className="text-2xl font-bold mb-4">Builder Canvas</h1>
+        <div className="space-y-4">
+          {elements.map((el) => (
+            <div key={el.id} className="border p-3 rounded-md bg-white shadow">
+              {el.type === "image" ? (
+                <input
+                  type="text"
+                  value={el.content}
+                  onChange={(e) => handleContentChange(el.id, e.target.value)}
+                  placeholder="Image URL"
+                  className="w-full p-2 border rounded"
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={el.content}
+                  onChange={(e) => handleContentChange(el.id, e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
+              )}
+            </div>
+          ))}
+        </div>
       </div>
-
-      {/* Right Properties Panel */}
-      <PropertiesPanel
-        selectedElement={selected}
-        onChange={handleUpdateElement}
-      />
     </div>
   );
 };
